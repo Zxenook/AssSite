@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+    <div class="nav-left">
+        <a href="/" class="logo">UE5 <span>HUB</span></a>
+    </div>
+    <div class="nav-right">
+        <a href="/" class="nav-link">Главная</a>
+        <a href="/games" class="nav-link">Игры</a>
+        <a href="/forum" class="nav-link">Форум</a>
+        <a href="/about" class="nav-link">О нас</a>
+        <div class="nav-separator"></div>
+        <a href="/register" class="btn-reg">Регистрация</a>
+    </div>
+</nav>
+
+<div class="auth-box-pg">
+    <h2 style="text-align:center;">Вход в аккаунт</h2>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <p style="color:#ef4444; margin-bottom:10px; text-align:center;">{{ messages[0] }}</p>
+        {% endif %}
+    {% endwith %}
+    <form method="POST">
+        <input type="email" name="email" class="inp" placeholder="Адрес электронной почты" required>
+        <input type="password" name="password" class="inp" placeholder="Пароль" required>
+        <button class="btn-blue" style="width:100%; margin-top:10px;">Войти прямо сейчас</button>
+    </form>
+    <p style="margin-top:20px; color:#888; font-size:12px; text-align:center;">
+        Нет учетной записи? <a href="/register" style="color:#fff; text-decoration:underline;">Зарегистрироваться</a>
+    </p>
+</div>
+
+</body>
+</html>

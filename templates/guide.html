@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ guide.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+    <div class="nav-left">
+        <a href="/" class="logo">UE5 <span>HUB</span></a>
+    </div>
+    <div class="nav-right">
+        <a href="/" class="nav-link">Главная</a>
+        <a href="/games" class="nav-link">Игры</a>
+        <a href="/forum" class="nav-link">Форум</a>
+        <a href="/about" class="nav-link">О нас</a>
+        <div class="nav-separator"></div>
+        <div class="auth-box">
+            {% if session.get('username') %}
+                <span style="font-size:11px; font-weight:700; color:#fff; text-transform:uppercase;">{{ session['username'] }}</span>
+                <a href="/logout" class="btn-login" style="color:#ef4444;">Выйти</a>
+            {% else %}
+                <a href="/login" class="btn-login">Вход</a>
+                <a href="/register" class="btn-reg">Регистрация</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<div class="article-wrap">
+    <div class="guide-head">
+        <div class="card-meta" style="justify-content:flex-start; gap:10px; margin-bottom:20px;">
+            <span class="tag" style="background:var(--accent);">{{ guide.tag }}</span>
+            <span class="tag" style="background:transparent; border:1px solid #444; color:#aaa;">{{ guide.difficulty }}</span>
+        </div>
+        <h1 class="article-title">{{ guide.title }}</h1>
+        <p class="lead">{{ guide.description }}</p>
+    </div>
+
+    <div class="content">
+        {{ guide.content | safe }}
+    </div>
+
+    <div class="comments-section">
+        <h3 style="margin-bottom:20px; color:#fff;">Комментарии ({{ comments|length }})</h3>
+
+        {% if session.get('user_id') %}
+            <form action="{{ url_for('add_comment', parent_type='guide', parent_id=guide.slug) }}" method="POST" style="margin-bottom: 30px;">
+                <textarea name="content" class="inp" rows="3" placeholder="Написать комментарий..." required></textarea>
+                <button class="btn-blue">Отправить</button>
+            </form>
+        {% else %}
+            <div style="margin-bottom: 30px; padding: 20px; background: #222; border-radius: 4px;">
+                <p style="margin:0;">Войдите в аккаунт, чтобы оставить комментарий.</p>
+            </div>
+        {% endif %}
+
+        {% for com in comments %}
+        <div class="comment-box">
+            <div class="comment-meta">
+                {{ com.username }}
+                <span class="comment-date">{{ com.created_at }}</span>
+            </div>
+            <div class="comment-content">{{ com.content }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+</body>
+</html>

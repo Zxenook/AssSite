@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Игры на Unreal Engine</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+    <div class="nav-left">
+        <a href="/" class="logo">UE5 <span>HUB</span></a>
+    </div>
+    <div class="nav-right">
+        <a href="/" class="nav-link">Главная</a>
+        <a href="/games" class="nav-link active">Игры</a>
+        <a href="/forum" class="nav-link">Форум</a>
+        <a href="/about" class="nav-link">О нас</a>
+        <div class="nav-separator"></div>
+        <div class="auth-box">
+            {% if session.get('username') %}
+                <span style="font-size:11px; font-weight:700; color:#fff; text-transform:uppercase;">{{ session['username'] }}</span>
+                <a href="/logout" class="btn-login" style="color:#ef4444;">Выйти</a>
+            {% else %}
+                <a href="/login" class="btn-login">Вход</a>
+                <a href="/register" class="btn-reg">Регистрация</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<div class="hero">
+    <h1>Showcase</h1>
+    <p>Популярные проекты, созданные на UE4/UE5</p>
+</div>
+
+<div class="container">
+    <div class="grid">
+        {% for game in games %}
+        <div class="card">
+            <div class="card-meta">
+                <span class="tag">{{ game.engine }}</span>
+                <span class="diff">{{ game.genre }}</span>
+            </div>
+            <h3>{{ game.title }}</h3>
+            <p>{{ game.description }}</p>
+
+            <div class="store-btns">
+                {% if game.steam_url %}
+                    <a href="{{ game.steam_url }}" target="_blank" class="btn-store btn-steam">
+                        <!-- Правильный логотип Steam (Поршень) -->
+                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="fill:currentColor; width:14px; height:14px;">
+                            <path d="M.329 10.333A8.01 8.01 0 0 0 7.99 16C12.414 16 16 12.418 16 8s-3.586-8-8.009-8A8.006 8.006 0 0 0 0 7.468l.003.006 4.304 1.769A2.2 2.2 0 0 1 5.62 8.88l1.96-2.844-.001-.04a3.046 3.046 0 0 1 3.042-3.043 3.046 3.046 0 0 1 3.042 3.043 3.047 3.047 0 0 1-3.111 3.044l-2.804 2a2.223 2.223 0 0 1-3.075 2.11 2.22 2.22 0 0 1-1.312-1.568L.33 10.333Z"/>
+                            <path d="M4.868 12.683a1.715 1.715 0 0 0 1.318-3.165 1.7 1.7 0 0 0-1.263-.02l1.023.424a1.261 1.261 0 1 1-.97 2.33l-.99-.41a1.7 1.7 0 0 0 .882.84Zm3.726-6.687a2.03 2.03 0 0 0 2.027 2.029 2.03 2.03 0 0 0 2.027-2.029 2.03 2.03 0 0 0-2.027-2.027 2.03 2.03 0 0 0-2.027 2.027m2.03-1.527a1.524 1.524 0 1 1-.002 3.048 1.524 1.524 0 0 1 .002-3.048"/>
+                        </svg>
+                        Steam
+                    </a>
+                {% endif %}
+
+                {% if game.epic_url %}
+                    <a href="{{ game.epic_url }}" target="_blank" class="btn-store btn-epic">
+                        <!-- Правильный логотип Epic Games (Щит) -->
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="fill:currentColor; width:14px; height:14px;">
+                            <path d="M12 24C5.373 24 0 18.627 0 12S5.373 0 12 0s12 5.373 12 12-5.373 12-12 12z" fill="none"/> <!-- Прозрачный круг для отступа если нужно -->
+                            <path d="M21.2 5.4L12 1.3 2.8 5.4v6c0 5.6 3.9 10.9 9.2 12.2 5.3-1.3 9.2-6.6 9.2-12.2v-6z" transform="scale(0.8) translate(3,3)"/> <!-- Форма щита -->
+                        </svg>
+                        Epic
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<footer>UE5 Knowledge Base &copy; 2025</footer>
+
+</body>
+</html>

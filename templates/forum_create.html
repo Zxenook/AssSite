@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Новая тема</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+    <div class="nav-left">
+        <a href="/" class="logo">UE5 <span>HUB</span></a>
+    </div>
+    <div class="nav-right">
+        <a href="/forum" class="btn-login">Отмена</a>
+    </div>
+</nav>
+
+<div class="auth-box-pg" style="max-width: 900px;">
+    <h2>Создать тему</h2>
+    <form method="POST">
+        <label style="font-size:10px; font-weight:700; color:#888; margin-bottom:5px; display:block;">ЗАГОЛОВОК</label>
+        <input type="text" name="title" class="inp" placeholder="Коротко о главном" required>
+
+        <label style="font-size:10px; font-weight:700; color:#888; margin-bottom:5px; display:block;">СОДЕРЖАНИЕ</label>
+
+        <!-- Кнопка загрузки -->
+        <div style="margin-bottom: 10px;">
+            <button type="button" class="btn" id="uploadBtn" style="font-size: 10px; padding: 8px 15px;">
+                📷 Вставить картинку
+            </button>
+            <span id="uploadStatus" style="font-size:11px; color:#888; margin-left:10px;"></span>
+        </div>
+        <input type="file" id="fileInput" style="display: none;" accept="image/*">
+
+        <textarea name="content" id="contentArea" class="inp" rows="12" placeholder="Опишите ваш вопрос..." required></textarea>
+
+        <button class="btn-blue" style="width:100%; margin-top:10px;">Опубликовать</button>
+    </form>
+</div>
+
+<script>
+    const uploadBtn = document.getElementById('uploadBtn');
+    const fileInput = document.getElementById('fileInput');
+    const contentArea = document.getElementById('contentArea');
+    const status = document.getElementById('uploadStatus');
+
+    uploadBtn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', async () => {
+        if (fileInput.files.length === 0) return;
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append('file', file);
+
+        status.innerText = "Загрузка...";
+        uploadBtn.disabled = true;
+
+        try {
+            const response = await fetch('/upload_image', { method: 'POST', body: formData });
+            const data = await response.json();
+
+            if (data.url) {
+                insertAtCursor(contentArea, `<img src="${data.url}" class="forum-img" alt="image">`);
+                status.innerText = "";
+            } else {
+                status.innerText = "Ошибка: " + (data.error || "Unknown");
+            }
+        } catch (error) {
+            console.error(error);
+            status.innerText = "Ошибка сети";
+        } finally {
+            uploadBtn.disabled = false;
+            fileInput.value = '';
+        }
+    });
+
+    function insertAtCursor(myField, myValue) {
+        if (document.selection) {
+            myField.focus();
+            sel = document.selection.createRange();
+            sel.text = myValue;
+        } else if (myField.selectionStart || myField.selectionStart == '0') {
+            var startPos = myField.selectionStart;
+            var endPos = myField.selectionEnd;
+            myField.value = myField.value.substring(0, startPos) + "\n" + myValue + "\n" + myField.value.substring(endPos, myField.value.length);
+        } else {
+            myField.value += myValue;
+        }
+    }
+</script>
+
+</body>
+</html>

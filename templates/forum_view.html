@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ thread.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+    <div class="nav-left">
+        <a href="/" class="logo">UE5 <span>HUB</span></a>
+    </div>
+    <div class="nav-right">
+        <a href="/" class="nav-link">Главная</a>
+        <a href="/games" class="nav-link">Игры</a>
+        <a href="/forum" class="nav-link">Форум</a>
+        <a href="/about" class="nav-link">О нас</a>
+        <div class="nav-separator"></div>
+        <div class="auth-box">
+            {% if session.get('username') %}
+                <span style="font-size:11px; font-weight:700; color:#fff; text-transform:uppercase;">{{ session['username'] }}</span>
+                <a href="/logout" class="btn-login" style="color:#ef4444;">Выйти</a>
+            {% else %}
+                <a href="/login" class="btn-login">Вход</a>
+                <a href="/register" class="btn-reg">Регистрация</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<div class="article-wrap">
+    <div class="card" style="margin-bottom: 30px; border: 1px solid #333; background: #1a1a1a;">
+        <h1 style="margin-bottom: 10px; font-size: 24px;">{{ thread.title }}</h1>
+        <div style="font-size:12px; color:#666; margin-bottom:20px; border-bottom:1px solid #333; padding-bottom:10px;">
+            Автор: <span style="color:var(--accent);">{{ thread.username }}</span> | {{ thread.created_at }}
+        </div>
+        <!-- | safe нужен чтобы отображался HTML код картинок -->
+        <div class="content">
+            {{ thread.content | safe }}
+        </div>
+    </div>
+
+    <div class="comments-section">
+        <h3 style="margin-bottom:20px; color:#fff;">Ответы ({{ comments|length }})</h3>
+
+        {% for com in comments %}
+        <div class="comment-box">
+            <div class="comment-meta">
+                {{ com.username }}
+                <span class="comment-date">{{ com.created_at }}</span>
+            </div>
+            <div class="comment-content">{{ com.content | safe }}</div>
+        </div>
+        {% endfor %}
+
+        {% if session.get('user_id') %}
+            <form action="{{ url_for('add_comment', parent_type='thread', parent_id=thread.id) }}" method="POST" style="margin-top: 40px;">
+                <h4 style="margin-bottom:10px; color:#ccc;">Ваш ответ:</h4>
+
+                <!-- Загрузка картинки в ответе -->
+                <div style="margin-bottom: 10px;">
+                    <button type="button" class="btn" id="uploadBtn" style="font-size: 10px; padding: 6px 12px;">
+                        📷 Картинка
+                    </button>
+                    <span id="uploadStatus" style="font-size:11px; color:#888; margin-left:10px;"></span>
+                </div>
+                <input type="file" id="fileInput" style="display: none;" accept="image/*">
+
+                <textarea name="content" id="contentArea" class="inp" rows="5" placeholder="Написать ответ..." required></textarea>
+                <button class="btn-blue" style="margin-top:10px;">Ответить</button>
+            </form>
+        {% else %}
+            <p style="margin-top:30px; color:#888;">Войдите, чтобы ответить.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    const uploadBtn = document.getElementById('uploadBtn');
+    const fileInput = document.getElementById('fileInput');
+    const contentArea = document.getElementById('contentArea');
+    const status = document.getElementById('uploadStatus');
+
+    if(uploadBtn) {
+        uploadBtn.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', async () => {
+            if (fileInput.files.length === 0) return;
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            status.innerText = "Загрузка...";
+            uploadBtn.disabled = true;
+
+            try {
+                const response = await fetch('/upload_image', { method: 'POST', body: formData });
+                const data = await response.json();
+
+                if (data.url) {
+                    insertAtCursor(contentArea, `<img src="${data.url}" class="forum-img" alt="image">`);
+                    status.innerText = "";
+                } else {
+                    status.innerText = "Ошибка";
+                }
+            } catch (error) {
+                console.error(error);
+                status.innerText = "Ошибка сети";
+            } finally {
+                uploadBtn.disabled = false;
+                fileInput.value = '';
+            }
+        });
+    }
+
+    function insertAtCursor(myField, myValue) {
+        if (document.selection) {
+            myField.focus();
+            sel = document.selection.createRange();
+            sel.text = myValue;
+        } else if (myField.selectionStart || myField.selectionStart == '0') {
+            var startPos = myField.selectionStart;
+            var endPos = myField.selectionEnd;
+            myField.value = myField.value.substring(0, startPos) + "\n" + myValue + "\n" + myField.value.substring(endPos, myField.value.length);
+        } else {
+            myField.value += myValue;
+        }
+    }
+</script>
+
+</body>
+</html>

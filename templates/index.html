@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>О нас - UE5 HUB</title>
+    <title>{{ hero.title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -12,10 +12,10 @@
         <a href="/" class="logo">UE5 <span>HUB</span></a>
     </div>
     <div class="nav-right">
-        <a href="/" class="nav-link">Главная</a>
+        <a href="/" class="nav-link active">Главная</a>
         <a href="/games" class="nav-link">Игры</a>
         <a href="/forum" class="nav-link">Форум</a>
-        <a href="/about" class="nav-link active">О нас</a>
+        <a href="/about" class="nav-link">О нас</a>
         <div class="nav-separator"></div>
         <div class="auth-box">
             {% if session.get('username') %}
@@ -30,18 +30,29 @@
 </nav>
 
 <div class="hero">
-    <h1>О проекте</h1>
-    <p>Наша миссия — структурировать хаос Unreal Engine.</p>
+    <h1>{{ hero.title }}</h1>
+    <p>{{ hero.desc }}</p>
 </div>
 
-<div class="article-wrap">
-    <div class="content">
-        <h2>Кто мы?</h2>
-        <p>UE5 HUB — это база знаний для технических художников, программистов геймплея и левел-дизайнеров. Мы устали от поверхностных туториалов на YouTube.</p>
-
-        <h2>Наша философия</h2>
-        <p>Мы верим в <strong>Deep Dive</strong> подход. Если мы пишем про систему частиц, мы разбираем, как она работает на GPU. Если мы пишем про мультиплеер, мы говорим про предикшн и лагокомпенсацию.</p>
+<div class="container">
+    {% for cat in categories %}
+    <div class="section" id="{{ cat.id }}">
+        <div class="sec-title">{{ cat.name }}</div>
+        <div class="grid">
+            {% for item in cat.guides %}
+            <div class="card">
+                <div class="card-meta">
+                    <span class="tag">{{ item.tag }}</span>
+                    <span class="diff">{{ item.difficulty }}</span>
+                </div>
+                <h3>{{ item.title }}</h3>
+                <p>{{ item.description }}</p>
+                <a href="{{ url_for('guide_page', slug=item.slug) }}" class="btn" style="margin-top:auto;">Читать</a>
+            </div>
+            {% endfor %}
+        </div>
     </div>
+    {% endfor %}
 </div>
 
 <footer>UE5 Knowledge Base &copy; 2025</footer>
